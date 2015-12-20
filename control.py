@@ -10,10 +10,10 @@ class control:
     def __del__(self):
         self.out.close()
 
-    def left(self):
+    def turnleft(self):
         self.out.write('0p0100000000')
 
-    def rigth(self):
+    def turnrigth(self):
         self.out.write('0p0200000000')
 
     def forward(self, power):
@@ -27,4 +27,8 @@ if __name__ == "__main__":
     port = "/dev/rfcomm0"
     ctrl = control(port)
     ctrl.forward(100)
-    ctrl.left()
+    ctrl.turnrigth()
+    sleep(1)
+    ctrl.turnleft()
+    ctrl.backward(100)
+    sleep(1)
