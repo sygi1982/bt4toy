@@ -7,15 +7,24 @@ Such hci dump can be analyzed with wireshark to see what is actually sent to dev
 Prerequisites:
 - pair with device
 - define your BT device in /etc/bluetooth/rfcomm.conf:
+
 rfcomm0 {
+
 	bind no;
+	
 	# address of device
+	
 	device 8C:DE:52:01:78:26;  
+	
 	# rfcomm channel on which SPP profile is avialable, can be obtained with "sdptool browse" command
 	channel	6;
+	
 	# some fancy name
+	
 	comment "BMW Z4 BT car serial port";
+	
 }
+
 then:
 -  rfcomm connect hci0
 - lunch the python control.py script, and have fun.
