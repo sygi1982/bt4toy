@@ -1,3 +1,11 @@
+#/*******************************************************************************
+#* Copyright (c) 2016 Grzegorz Sygieda
+#*
+#* Licensed under the Apache License, Version 2.0 (the "License");
+#* you may not use this file except in compliance with the License.
+#* You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+#*******************************************************************************/
+
 import serial
 import sys
 from time import sleep
@@ -45,7 +53,7 @@ if __name__ == "__main__":
     ctrl = Control(port)
     app = QApplication(sys.argv)
     view = QQuickView()
-    view.setSource(QUrl('QtUi/qml/QtUi/main.qml'))
+    view.setSource(QUrl('QtUi/main.qml'))
     context = view.rootContext()
     context.setContextProperty("control", ctrl)
 
