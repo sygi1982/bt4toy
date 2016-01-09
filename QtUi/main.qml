@@ -44,22 +44,23 @@ Rectangle {
             }
         }
 
-        function callCommand(cmd) {
+        function callCommand(cmd, power) {
             switch (cmd) {
                 case 0:
                     console.log("none cmd - skipping")
+                    control.idle()
                     break
                 case 1:
-                    control.forward()
+                    control.forward(power)
                     break
                 case 2:
-                    control.backward()
+                    control.backward(power)
                     break
                 case 3:
-                    control.left()
+                    control.left(power)
                     break
                 case 4:
-                    control.right()
+                    control.right(power)
                     break
             }
         }
@@ -112,7 +113,7 @@ Rectangle {
 
         TextField {
             id: teRows
-            x: 148
+            x: 145
             y: 18
             width: 19
             height: 20
@@ -140,9 +141,48 @@ Rectangle {
             }
         }
 
+        Text {
+            id: tInterval
+            x: 185
+            y: 18
+            text: qsTr("Interval:")
+            font.pixelSize: 12
+        }
+
+        TextField {
+            id: teInterval
+            x: 240
+            y: 18
+            width: 50
+            height: 20
+            text: qsTr(commandTimer.interval.toString())
+            font.pixelSize: 12
+            validator: IntValidator{bottom:100; top: 1000}
+            horizontalAlignment: TextInput.AlignHCenter
+            focus: true
+
+            style: TextFieldStyle {
+                        textColor: "black"
+                        background: Rectangle {
+                            radius: 20
+                            color: "grey"
+                            implicitWidth: 40
+                            implicitHeight: 24
+                            border.color: "black"
+                            border.width: 1
+                        }
+                    }
+
+            onTextChanged: {
+                commandTimer.interval = parseInt(text)
+                console.log("new timer interval: ", commandTimer.interval)
+            }
+        }
+
+
         Rectangle {
             id: startButton
-            x: 313
+            x: 330
             y: 10
             width: startButtonText.width + 20
             height: 30
@@ -242,12 +282,13 @@ Rectangle {
                 if (index <= commandPanel.columns * commandPanel.rows) {
                     commandGrid.currentIndex = index - 1
                     cmd = commandGrid.contentItem.children[index]
-                    console.log("cmd ", cmd.actualCommand)
-                    commandPanel.callCommand(cmd.actualCommand)
+                    console.log("cmd ", cmd.actualCommand, cmd.actualPower)
+                    commandPanel.callCommand(cmd.actualCommand, cmd.actualPower)
                 }
                 else {
                     index = 0
                     running = false
+                    commandGrid.enabled = true
                 }
                 index++
             }
@@ -284,6 +325,7 @@ Rectangle {
             objectName: "gridItem"
 
             property int actualCommand: 0
+            property int actualPower: 100
             property variant statesNames: ["NONE", "FORWARD", "BACKWARD", "LEFT", "RIGHT"]
 
             Rectangle {
@@ -297,10 +339,17 @@ Rectangle {
                 MouseArea {
                     id: commandMouseArea
                     anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
                     onClicked: {
                         commandGrid.currentIndex = index
-                        actualCommand++
-                        actualCommand = actualCommand >= 5 ? 0 : actualCommand
+                        if(mouse.button & Qt.LeftButton) {
+                            actualCommand++
+                            actualCommand = actualCommand >= 5 ? 0 : actualCommand
+                        }
+                        else if(mouse.button & Qt.RightButton) {
+                            actualCommand--
+                            actualCommand = actualCommand < 0 ? 4 : actualCommand
+                        }
                         commandRect.state = statesNames[actualCommand]
                         console.log("grid index clicked ", commandGrid.currentIndex, actualCommand)
                     }
@@ -333,6 +382,34 @@ Rectangle {
                     id: commandName
                     text: qsTr(cmdName)
                     anchors.centerIn: commandRect
+                }
+
+                TextField {
+                    width: 39
+                    height: 20
+                    anchors.horizontalCenter: commandRect.horizontalCenter
+                    anchors.top: commandName.bottom
+                    text: qsTr(actualPower.toString())
+                    font.pixelSize: 12
+                    validator: IntValidator{bottom:1; top: 100}
+                    horizontalAlignment: TextInput.AlignHCenter
+                    focus: true
+
+                    style: TextFieldStyle {
+                        textColor: "black"
+                        background: Rectangle {
+                            radius: 40
+                            color: "grey"
+                            implicitWidth: 40
+                            implicitHeight: 24
+                            border.color: "black"
+                            border.width: 1
+                        }
+                    }
+
+                    onTextChanged: {
+                        actualPower = parseInt(text)
+                    }
                 }
             }
        }

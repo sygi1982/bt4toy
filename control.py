@@ -24,27 +24,37 @@ class Control(QObject):
         self.out.close()
 
     @pyqtSlot()
-    def left(self):
-        print ('left')
-        cmd = '0p0100000000'
+    def idle(self):
+        cmd = '0p0000002000'
+        print ('idle')
+        self.out.write(cmd.encode('utf-8'))
+
+    @pyqtSlot(int)
+    def left(self, power):
+        power = (power * 255) / 100
+        cmd = '0p01' + hex(int(power))[2:] + '0020' + hex(int(power))[2:]
+        print ('left ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
     @pyqtSlot()
-    def right(self):
-        print ('right')
-        cmd = '0p0200000000'
+    def right(self, power):
+        power = (power * 255) / 100
+        cmd = '0p02' + hex(int(power))[2:] + '0020' + hex(int(power))[2:]
+        print ('right ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
-    @pyqtSlot()
-    def forward(self):
-        print ('forward')
-        cmd = '0p04001f0000'
+    @pyqtSlot(int)
+    def forward(self, power):
+        power = (power * 255) / 100
+        cmd = '0p0400' + hex(int(power))[2:] + '20' + hex(int(power))[2:]
+        print ('forward ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
-    @pyqtSlot()
-    def backward(self):
-        print ('backward')
-        cmd = '0p0800ff0000'
+    @pyqtSlot(int)
+    def backward(self, power):
+        power = (power * 255) / 100
+        cmd = '0p0800' + hex(int(power))[2:] + '20' + hex(int(power))[2:]
+        print ('backward ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
 
@@ -53,6 +63,8 @@ if __name__ == "__main__":
     ctrl = Control(port)
     app = QApplication(sys.argv)
     view = QQuickView()
+    view.setTitle('BMW Z4 control')
+    view.setResizeMode(QQuickView.SizeRootObjectToView)
     view.setSource(QUrl('QtUi/main.qml'))
     context = view.rootContext()
     context.setContextProperty("control", ctrl)
