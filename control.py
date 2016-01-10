@@ -32,28 +32,28 @@ class Control(QObject):
     @pyqtSlot(int)
     def left(self, power):
         power = (power * 255) / 100
-        cmd = '0p01' + hex(int(power))[2:] + '0020' + hex(int(power))[2:]
+        cmd = '0p01' + '{:02x}'.format(int(power)) + '0020' + '{:02x}'.format(int(power))
         print ('left ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
-    @pyqtSlot()
+    @pyqtSlot(int)
     def right(self, power):
         power = (power * 255) / 100
-        cmd = '0p02' + hex(int(power))[2:] + '0020' + hex(int(power))[2:]
+        cmd = '0p02' + '{:02x}'.format(int(power)) + '0020' + '{:02x}'.format(int(power))
         print ('right ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
     @pyqtSlot(int)
     def forward(self, power):
         power = (power * 255) / 100
-        cmd = '0p0400' + hex(int(power))[2:] + '20' + hex(int(power))[2:]
+        cmd = '0p0400' + '{:02x}'.format(int(power)) + '20' + '{:02x}'.format(int(power))
         print ('forward ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
     @pyqtSlot(int)
     def backward(self, power):
         power = (power * 255) / 100
-        cmd = '0p0800' + hex(int(power))[2:] + '20' + hex(int(power))[2:]
+        cmd = '0p0800' + '{:02x}'.format(int(power)) + '20' + '{:02x}'.format(int(power))
         print ('backward ' + str(power) + ' ' + cmd)
         self.out.write(cmd.encode('utf-8'))
 
