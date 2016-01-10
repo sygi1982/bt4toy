@@ -23,40 +23,82 @@ class Control(QObject):
     def __del__(self):
         self.out.close()
 
+    def parsePower(self, power):
+        self.power = int((power * 255) / 100)
+        self.trail = self.power + 51
+        if (self.trail > 255):
+            self.trail = 255
+
+    def flushCmd(self, cmd):
+        print ('flushing ' + cmd)
+        self.out.write(cmd.encode('utf-8'))
+
+    # NOTE: calculate values according to bt snoop file
     @pyqtSlot()
     def idle(self):
-        cmd = '0p0000002000'
+        cmd = '0p0000002033'
         print ('idle')
-        self.out.write(cmd.encode('utf-8'))
-
-    @pyqtSlot(int)
-    def left(self, power):
-        power = (power * 255) / 100
-        cmd = '0p01' + '{:02x}'.format(int(power)) + '0020' + '{:02x}'.format(int(power))
-        print ('left ' + str(power) + ' ' + cmd)
-        self.out.write(cmd.encode('utf-8'))
-
-    @pyqtSlot(int)
-    def right(self, power):
-        power = (power * 255) / 100
-        cmd = '0p02' + '{:02x}'.format(int(power)) + '0020' + '{:02x}'.format(int(power))
-        print ('right ' + str(power) + ' ' + cmd)
-        self.out.write(cmd.encode('utf-8'))
+        self.flushCmd(cmd)
 
     @pyqtSlot(int)
     def forward(self, power):
-        power = (power * 255) / 100
-        cmd = '0p0400' + '{:02x}'.format(int(power)) + '20' + '{:02x}'.format(int(power))
-        print ('forward ' + str(power) + ' ' + cmd)
-        self.out.write(cmd.encode('utf-8'))
+        self.parsePower(power)
+        cmd = '0p0400' + '{:02x}'.format(self.power)
+        cmd += '20' + '{:02x}'.format(self.trail)
+        print ('forward ' + str(power))
+        self.flushCmd(cmd)
 
     @pyqtSlot(int)
     def backward(self, power):
-        power = (power * 255) / 100
-        cmd = '0p0800' + '{:02x}'.format(int(power)) + '20' + '{:02x}'.format(int(power))
-        print ('backward ' + str(power) + ' ' + cmd)
-        self.out.write(cmd.encode('utf-8'))
+        self.parsePower(power)
+        cmd = '0p0800' + '{:02x}'.format(self.power)
+        cmd += '20' + '{:02x}'.format(self.trail)
+        print ('backward ' + str(power))
+        self.flushCmd(cmd)
 
+    @pyqtSlot()
+    def turnLeft(self):
+        cmd = '0p01ff0020ff'
+        print ('turn left')
+        self.flushCmd(cmd)
+
+    @pyqtSlot()
+    def turnRight(self):
+        cmd = '0p02ff0020ff'
+        print ('turn right')
+        self.flushCmd(cmd)
+
+    @pyqtSlot(int)
+    def forwardLeft(self, power):
+        self.parsePower(power)
+        cmd = '0p0500' + '{:02x}'.format(self.power)
+        cmd += '20' + '{:02x}'.format(self.trail)
+        print ('forward left ' + str(power))
+        self.flushCmd(cmd)
+
+    @pyqtSlot(int)
+    def forwardRight(self, power):
+        self.parsePower(power)
+        cmd = '0p0600' + '{:02x}'.format(self.power)
+        cmd += '20' + '{:02x}'.format(self.trail)
+        print ('forward right ' + str(power))
+        self.flushCmd(cmd)
+
+    @pyqtSlot(int)
+    def backwardLeft(self, power):
+        self.parsePower(power)
+        cmd = '0p0900' + '{:02x}'.format(self.power)
+        cmd += '20' + '{:02x}'.format(self.trail)
+        print ('backward left ' + str(power))
+        self.flushCmd(cmd)
+
+    @pyqtSlot(int)
+    def backwardRight(self, power):
+        self.parsePower(power)
+        cmd = '0p0a00' + '{:02x}'.format(self.power)
+        cmd += '20' + '{:02x}'.format(self.trail)
+        print ('backward right ' + str(power))
+        self.flushCmd(cmd)
 
 if __name__ == "__main__":
     port = "/dev/rfcomm0"

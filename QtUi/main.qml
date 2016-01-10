@@ -47,7 +47,6 @@ Rectangle {
         function callCommand(cmd, power) {
             switch (cmd) {
                 case 0:
-                    console.log("none cmd - skipping")
                     control.idle()
                     break
                 case 1:
@@ -57,10 +56,22 @@ Rectangle {
                     control.backward(power)
                     break
                 case 3:
-                    control.left(power)
+                    control.turnLeft()
                     break
                 case 4:
-                    control.right(power)
+                    control.turnRight()
+                    break
+                case 5:
+                    control.forwardLeft(power)
+                    break
+                case 6:
+                    control.forwardRight(power)
+                    break
+                case 7:
+                    control.backwardLeft(power)
+                    break
+                case 8:
+                    control.backwardRight(power)
                     break
             }
         }
@@ -254,6 +265,8 @@ Rectangle {
                     console.log("stop button clicked")
                     commandTimer.stop()
                     commandGrid.enabled = true
+                    commandGrid.currentIndex = 0
+                    commandTimer.index = 1
                 }
 
                 onPressed: {
@@ -326,7 +339,8 @@ Rectangle {
 
             property int actualCommand: 0
             property int actualPower: 100
-            property variant statesNames: ["NONE", "FORWARD", "BACKWARD", "LEFT", "RIGHT"]
+            property variant sNames: ["NONE", "FORWARD", "BACKWARD", "LEFT", "RIGHT",
+                                      "FLEFT", "FRIGHT", "BLEFT", "BRIGHT"]
 
             Rectangle {
                 id: commandRect
@@ -344,13 +358,13 @@ Rectangle {
                         commandGrid.currentIndex = index
                         if(mouse.button & Qt.LeftButton) {
                             actualCommand++
-                            actualCommand = actualCommand >= 5 ? 0 : actualCommand
+                            actualCommand = actualCommand >= sNames.length ? 0 : actualCommand
                         }
                         else if(mouse.button & Qt.RightButton) {
                             actualCommand--
-                            actualCommand = actualCommand < 0 ? 4 : actualCommand
+                            actualCommand = actualCommand < 0 ? sNames.length-1 : actualCommand
                         }
-                        commandRect.state = statesNames[actualCommand]
+                        commandRect.state = sNames[actualCommand]
                         console.log("grid index clicked ", commandGrid.currentIndex, actualCommand)
                     }
                 }
@@ -359,22 +373,42 @@ Rectangle {
                     State {
                       name: "FORWARD"
                       PropertyChanges {target:commandRect; color:"green"}
-                      PropertyChanges {target:commandName; text: qsTr("FORWARD")}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[1])}
                     },
                     State {
                       name: "BACKWARD"
                       PropertyChanges {target:commandRect; color:"red"}
-                      PropertyChanges {target:commandName; text: qsTr("BACKWARD")}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[2])}
                     },
                     State {
                       name: "LEFT"
                       PropertyChanges {target:commandRect; color:"blue"}
-                      PropertyChanges {target:commandName; text: qsTr("LEFT")}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[3])}
                     },
                     State {
                       name: "RIGHT"
                       PropertyChanges {target:commandRect; color:"yellow"}
-                      PropertyChanges {target:commandName; text: qsTr("RIGHT")}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[4])}
+                    },
+                    State {
+                      name: "FLEFT"
+                      PropertyChanges {target:commandRect; color:"cyan"}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[5])}
+                    },
+                    State {
+                      name: "FRIGHT"
+                      PropertyChanges {target:commandRect; color:"magenta"}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[6])}
+                    },
+                    State {
+                      name: "BLEFT"
+                      PropertyChanges {target:commandRect; color:"brown"}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[7])}
+                    },
+                    State {
+                      name: "BRIGHT"
+                      PropertyChanges {target:commandRect; color:"steelblue"}
+                      PropertyChanges {target:commandName; text: qsTr(sNames[8])}
                     }
                   ]
 
